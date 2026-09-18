@@ -1,0 +1,31 @@
+# Environment & Secrets (CRITICAL: Never commit your actual API keys or passwords)
+.env
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Python Bytecode & Caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Flask & Database local instances
+instance/
+*.sqlite
+*.db
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor configurations
+.vscode/
+.idea/
+*.swp
+*.swo
