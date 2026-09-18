@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-4">
+    <div class="card p-4 p-md-5 border-0 shadow-sm">
+      <div class="text-center mb-4">
+        <div class="brand-badge-box mx-auto mb-2" style="width: 44px; height: 44px; font-size: 1.3rem;">
+          <i class="bi bi-person-plus-fill text-white"></i>
+        </div>
+        <h4 class="fw-bold mb-1 text-slate-900">Create Account</h4>
+        <p class="text-muted small">Track and manage your support tickets in one place</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('web.register') }}">
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Full Name *</label>
+          <input type="text" name="name" class="form-control {% if errors.name %}is-invalid{% endif %}" placeholder="e.g. John Doe" required>
+          {% if errors.name %}<div class="invalid-feedback">{{ errors.name }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Email Address *</label>
+          <input type="email" name="email" class="form-control {% if errors.email %}is-invalid{% endif %}" placeholder="john@example.com" required>
+          {% if errors.email %}<div class="invalid-feedback">{{ errors.email }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Password *</label>
+          <input type="password" name="password" class="form-control {% if errors.password %}is-invalid{% endif %}" placeholder="Minimum 6 characters" required>
+          {% if errors.password %}<div class="invalid-feedback">{{ errors.password }}</div>{% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2.5 fw-semibold rounded-3 shadow-sm">
+          Sign Up
+        </button>
+      </form>
+
+      <div class="text-center mt-3 pt-3 border-top">
+        <span class="small text-muted">Already have an account?</span>
+        <a href="{{ url_for('web.login') }}" class="small fw-bold text-decoration-none ms-1 text-primary">Log in</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

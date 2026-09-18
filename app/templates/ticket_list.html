@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Filter & Search Toolbar -->
+<div class="card p-3 mb-4 border-0">
+  <form method="GET" action="{{ url_for('web.ticket_list') }}" class="row g-2 align-items-center">
+    <div class="col-md-4">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+        <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search reference, subject, or customer email..." value="{{ search }}">
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <select name="status" class="form-select">
+        <option value="">Status (All)</option>
+        {% for s in ['Open', 'In Progress', 'Resolved', 'Closed'] %}
+        <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <select name="category" class="form-select">
+        <option value="">Category (All)</option>
+        {% for c in ['Technical', 'Billing', 'Account', 'General'] %}
+        <option value="{{ c }}" {% if category == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <select name="priority" class="form-select">
+        <option value="">Priority (All)</option>
+        {% for p in ['High', 'Medium', 'Low'] %}
+        <option value="{{ p }}" {% if priority == p %}selected{% endif %}>{{ p }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-primary w-100 fw-semibold">Filter</button>
+      <a href="{{ url_for('web.ticket_list') }}" class="btn btn-outline-secondary" title="Reset"><i class="bi bi-arrow-counterclockwise"></i></a>
+    </div>
+  </form>
+</div>
+
+<!-- Tickets Table Card -->
+<div class="card border-0 overflow-hidden">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Customer</th>
+          <th>Subject</th>
+          <th>Category</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Logged At</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in pagination.items %}
+        <tr>
+          <td>
+            <span class="font-monospace fw-bold text-primary">{{ t.reference_no }}</span>
+          </td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar-circle">{{ t.customer_name[0] }}</div>
+              <div>
+                <div class="fw-semibold text-slate-800 small">{{ t.customer_name }}</div>
+                <div class="text-muted small" style="font-size: 0.75rem;">{{ t.customer_email }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="fw-semibold text-dark text-truncate" style="max-width: 260px;">{{ t.subject }}</div>
+          </td>
+          <td>
+            <span class="badge badge-cat">{{ t.category }}</span>
+          </td>
+          <td>
+            <span class="badge badge-pri-{{ t.priority.lower() }}">{{ t.priority }}</span>
+          </td>
+          <td>
+            <span class="badge badge-status-{{ t.status.lower().replace(' ', '') }}">{{ t.status }}</span>
+          </td>
+          <td class="text-muted small">
+            {{ t.created_at.strftime('%b %d, %H:%M') }}
+          </td>
+          <td class="text-end">
+            <a href="{{ url_for('web.ticket_detail', ticket_id=t.id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+              Open <i class="bi bi-chevron-right ms-1 small"></i>
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" class="text-center py-5">
+            <div class="text-muted">
+              <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
+              No tickets found matching your query.
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Server-Side Pagination -->
+  {% if pagination.pages > 1 %}
+  <div class="p-3 bg-white border-top d-flex justify-content-between align-items-center">
+    <span class="small text-muted">Showing page {{ pagination.page }} of {{ pagination.pages }}</span>
+    <ul class="pagination pagination-sm mb-0">
+      {% for p in pagination.iter_pages() %}
+        {% if p %}
+          <li class="page-item {% if p == pagination.page %}active{% endif %}">
+            <a class="page-link" href="{{ url_for('web.ticket_list', page=p, q=search, status=status, category=category, priority=priority) }}">{{ p }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

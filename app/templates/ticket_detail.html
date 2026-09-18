@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Breadcrumbs & Workspace Header -->
+<nav aria-label="breadcrumb" class="mb-2">
+  <ol class="breadcrumb small">
+    <li class="breadcrumb-item"><a href="{{ url_for('web.ticket_list') }}" class="text-decoration-none">Tickets</a></li>
+    <li class="breadcrumb-item active fw-bold text-dark font-monospace" aria-current="page">{{ ticket.reference_no }}</li>
+  </ol>
+</nav>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
+  <div class="d-flex align-items-center gap-3">
+    <div class="p-2.5 bg-primary bg-opacity-10 text-primary rounded-3">
+      <i class="bi bi-ticket-detailed fs-3"></i>
+    </div>
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <h4 class="fw-bold mb-0 font-monospace text-primary">{{ ticket.reference_no }}</h4>
+        <span class="badge badge-status-{{ ticket.status.lower().replace(' ', '') }}">{{ ticket.status }}</span>
+        <span class="badge badge-pri-{{ ticket.priority.lower() }}">{{ ticket.priority }} Priority</span>
+      </div>
+      <div class="text-muted small">Created on {{ ticket.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+    </div>
+  </div>
+  <a href="{{ url_for('web.ticket_list') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+    <i class="bi bi-arrow-left me-1"></i> Back to Queue
+  </a>
+</div>
+
+<div class="row g-4">
+  <!-- Left Side: Subject Card, Description, AI Insight, Timeline -->
+  <div class="col-lg-8">
+    <!-- Structured Subject & Customer Header Card -->
+    <div class="card p-4 mb-4">
+      <div class="text-uppercase text-muted fw-bold small" style="font-size: 0.72rem; letter-spacing: 0.05em;">Ticket Subject</div>
+      <h5 class="fw-bold text-dark mt-1 mb-3">{{ ticket.subject }}</h5>
+      
+      <div class="d-flex flex-wrap align-items-center gap-3 pt-3 border-top bg-light p-3 rounded-3">
+        <div class="avatar-circle flex-shrink-0">{{ ticket.customer_name[0] | upper }}</div>
+        <div>
+          <div class="fw-bold text-dark small">{{ ticket.customer_name }}</div>
+          <div class="text-muted small">{{ ticket.customer_email }}</div>
+        </div>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <span class="badge badge-cat">{{ ticket.category }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Description Card -->
+    <div class="card p-4 mb-4">
+      <h6 class="fw-bold text-slate-800 small text-uppercase mb-3" style="letter-spacing: 0.05em;">Issue Description</h6>
+      <div class="lh-base text-dark" style="white-space: pre-wrap; font-size: 0.95rem;">{{ ticket.description }}</div>
+    </div>
+
+    <!-- AI Intelligence Block -->
+    <div class="card p-4 mb-4 border-start border-4 border-primary bg-primary bg-opacity-10">
+      <div class="d-flex align-items-center gap-2 mb-2 text-primary fw-bold">
+        <i class="bi bi-robot fs-5"></i>
+        <span>AI Engine Summary</span>
+      </div>
+      <p class="fs-6 fst-italic text-dark mb-3">"{{ ticket.ai_summary or 'No AI summary generated.' }}"</p>
+      <div class="d-flex gap-2">
+        <span class="badge badge-cat">{{ ticket.category }}</span>
+        <span class="badge badge-pri-{{ ticket.priority.lower() }}">{{ ticket.priority }} Priority</span>
+      </div>
+    </div>
+
+    <!-- Audit History Timeline -->
+    <div class="card p-4">
+      <h6 class="fw-bold mb-4 text-slate-800"><i class="bi bi-clock-history me-2 text-primary"></i>Audit Trail & Status History</h6>
+      <div class="timeline">
+        {% for h in ticket.history %}
+        <div class="timeline-item">
+          <div class="timeline-point"></div>
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <div>
+              <span class="badge badge-status-{{ h.previous_status.lower().replace(' ', '') }}">{{ h.previous_status }}</span>
+              <i class="bi bi-arrow-right mx-1 small text-muted"></i>
+              <span class="badge badge-status-{{ h.new_status.lower().replace(' ', '') }}">{{ h.new_status }}</span>
+            </div>
+            <span class="small text-muted">{{ h.created_at.strftime('%b %d, %Y %I:%M %p') }}</span>
+          </div>
+          <p class="small text-dark mb-1">{{ h.remark }}</p>
+          <span class="small text-muted" style="font-size: 0.75rem;">By: <strong>{{ h.user.name if h.user else "System / Customer" }}</strong></span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Workflow Actions & Overrides -->
+  <div class="col-lg-4">
+    <!-- Status Transition Card -->
+    <div class="card p-3 mb-4">
+      <h6 class="fw-bold mb-3"><i class="bi bi-arrow-repeat me-1 text-primary"></i>Transition Ticket Status</h6>
+      <form method="POST" action="{{ url_for('web.ticket_detail', ticket_id=ticket.id) }}">
+        <input type="hidden" name="action" value="update_status">
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">New Status</label>
+          <select name="status" class="form-select">
+            {% for st in ['Open', 'In Progress', 'Resolved', 'Closed'] %}
+            <option value="{{ st }}" {% if ticket.status == st %}selected{% endif %}>{{ st }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Audit Remark *</label>
+          <textarea name="remark" class="form-control" rows="3" placeholder="State reason for the transition..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 fw-semibold">Apply Status Transition</button>
+      </form>
+    </div>
+
+    <!-- Manual AI Override Card -->
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3"><i class="bi bi-sliders me-1 text-secondary"></i>Override AI Tags</h6>
+      <form method="POST" action="{{ url_for('web.ticket_detail', ticket_id=ticket.id) }}">
+        <input type="hidden" name="action" value="override_ai">
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Category</label>
+          <select name="category" class="form-select">
+            {% for c in ['Technical', 'Billing', 'Account', 'General'] %}
+            <option value="{{ c }}" {% if ticket.category == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Priority</label>
+          <select name="priority" class="form-select">
+            {% for p in ['High', 'Medium', 'Low'] %}
+            <option value="{{ p }}" {% if ticket.priority == p %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-outline-secondary w-100 fw-semibold">Save Overrides</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

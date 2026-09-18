@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-9 col-lg-7">
+    <div class="card p-4 p-md-5 border-0 shadow-sm">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="brand-badge-box">
+          <i class="bi bi-pencil-square text-white fs-5"></i>
+        </div>
+        <div>
+          <h4 class="fw-bold mb-0 text-slate-900">Raise Support Ticket</h4>
+          <span class="text-muted small">Our AI engine will analyze, summarize, and prioritize your issue[cite: 1].</span>
+        </div>
+      </div>
+
+      <form id="ticketSubmissionForm" method="POST" action="{{ url_for('web.submit_ticket') }}">
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Your Name *</label>
+            <input type="text" name="name" class="form-control {% if errors.name %}is-invalid{% endif %}" placeholder="e.g. Alex Henderson" value="{{ form.name or '' }}" required>
+            {% if errors.name %}<div class="invalid-feedback">{{ errors.name }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Email Address *</label>
+            <input type="email" name="email" class="form-control {% if errors.email %}is-invalid{% endif %}" placeholder="alex@example.com" value="{{ form.email or '' }}" required>
+            {% if errors.email %}<div class="invalid-feedback">{{ errors.email }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Subject *</label>
+          <input type="text" name="subject" class="form-control {% if errors.subject %}is-invalid{% endif %}" placeholder="Brief title of the problem" value="{{ form.subject or '' }}" required>
+          {% if errors.subject %}<div class="invalid-feedback">{{ errors.subject }}</div>{% endif %}
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label small fw-semibold">Issue Description *</label>
+          <textarea name="description" rows="5" class="form-control {% if errors.description %}is-invalid{% endif %}" placeholder="Please describe the issue in detail..." required>{{ form.description or '' }}</textarea>
+          {% if errors.description %}<div class="invalid-feedback">{{ errors.description }}</div>{% endif %}
+        </div>
+
+        <button id="submitBtn" type="submit" class="btn btn-primary w-100 py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-2 rounded-3 shadow-sm">
+          <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+          <span id="btnText">Submit Ticket</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center py-5">
+  <div class="card shadow-sm border-0 d-inline-block p-5 text-center" style="max-width: 500px;">
+    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+    <h3 class="fw-bold mt-3">Ticket Submitted</h3>
+    <p class="text-muted">Your issue has been logged and queued for support review[cite: 1].</p>
+    <div class="alert alert-secondary fs-4 fw-monospace my-3">{{ reference_no }}</div>
+    <p class="small text-muted">Please quote this reference number in future correspondence[cite: 1].</p>
+    <a href="{{ url_for('web.submit_ticket') }}" class="btn btn-outline-primary mt-2">Submit Another Ticket</a>
+  </div>
+</div>
+{% endblock %}
