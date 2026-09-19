@@ -32,7 +32,7 @@ def inject_notifications():
 def home():
     if current_user.is_authenticated:
         return redirect(url_for('web.dashboard' if current_user.role == 'admin' else 'web.customer_portal'))
-    return redirect(url_for('web.submit_ticket'))
+    return redirect(url_for('web.login'))
 
 @web_bp.route('/register', methods=['GET', 'POST'])
 def register():

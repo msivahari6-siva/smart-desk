@@ -6,12 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (ticketForm) {
     ticketForm.addEventListener('submit', (e) => {
-      // Basic HTML5 validation trigger
+      
       if (!ticketForm.checkValidity()) {
         return;
       }
       
-      // Prevent double submit and display AI feedback
+      
       submitBtn.disabled = true;
       btnSpinner.classList.remove('d-none');
       btnText.textContent = 'Analyzing & Submitting...';
